@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+
+
+{% for mess in get_flashed_messages()  %}
+   <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+        {{mess}}
+   </div>
+{% endfor %}
+
+
+
+<div class="container">
+    <h1>Welcome to the Home Page</h1>
+    {% for post in posts %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="text-muted mb-5"> {{ post.author.username }}</h3>
+            <h4 class="card-title">{{ post.title }}</h4>
+            <p class="card-text mb-5">{{ post.content }}</p>
+            <hr>
+            <form method="POST" class="row " action="{{ url_for('add_comment', post_id=post.id) }} ">
+                <div class="form-group col-7 m-1">
+                    <textarea class="form-control " name="comment" placeholder="Write your comment here " required></textarea>
+                </div>
+               <button type="submit" class="m-1 col-2 mt-2 mb-5 btn btn-primary">Submit</button>
+            </form>
+
+            <button type="submit" class="mb-5 ml-2 btn btn-outline-primary like-btn{% if post_likes[post.id] %} liked{% endif %}" data-post-id="{{ post.id }}">
+                    Like{% if post_likes[post.id] %}d{% endif %}
+            </button>
+             <a href="{{ url_for('view_comments', post_id=post.id) }}" class="mb-5 btn btn-primary">View Comments</a>
+             <a href="{{ url_for('post_likes', post_id=post.id) }}" class="mb-5 btn btn-primary">View Likes</a>
+<!--            <div class="mt-3">-->
+<!--                <h5>Comments:</h5>-->
+<!--                <ul class="list-group">-->
+<!--                    {% for comment in post_comments[post.id] %}-->
+<!--                    <li class="list-group-item">  {{ comment.user.username }}: {{ comment.body }}</li>  &lt;!&ndash; Display username &ndash;&gt;-->
+<!--                    {% endfor %}-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--            <div class="mt-5 mb-3">-->
+<!--                <h5>Likes:</h5>-->
+<!--               <ul class="list-group">-->
+<!--                    {% for user in liked_users[post.id] %}-->
+<!--                        <li class="list-group-item">{{ user }}</li>-->
+<!--                    {% endfor %}-->
+<!--               </ul>-->
+<!--            </div>-->
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+<script>
+document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            likePost(postId);
+        });
+    });
+    function likePost(postId) {
+    fetch('/like/' + postId, {
+        method: 'POST',
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            const likeButton = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+            likeButton.classList.toggle('liked');
+            likeButton.style.color = 'red';
+            likeButton.style.borderColor = 'red';
+        } else {
+            // Display the error message
+            alert($error);
+        }
+    })
+    .catch(error => {
+        // Handle any network errors or exceptions
+        console.error('Error:', error);
+        alert('An error occurred. Please try again later.');
+    });
+
+
+
+}
+
+</script>
+{% endblock %}
+

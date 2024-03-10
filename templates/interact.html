@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Likes</title>
+</head>
+<body>
+
+    <div class="container">
+    <h1>Likes for "{{ post.title }}"</h1>
+    <ul class="list-group">
+        {% for user in liked_users %}
+        <li class="list-group-item">{{ user.username }}</li>
+        {% endfor %}
+    </ul>
+</div>
+</body>
+</html>
